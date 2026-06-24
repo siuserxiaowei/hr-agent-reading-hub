@@ -1,6 +1,10 @@
 import { learningPaths } from "../data/learning-paths.js";
+import { collections } from "../data/collections.js";
 import { sources } from "../data/sources.js";
 import { categories } from "../data/taxonomy.js";
+import { execFile } from "node:child_process";
+import http from "node:http";
+import https from "node:https";
 
 const REQUIRED_FIELDS = [
   "id",
@@ -20,6 +24,7 @@ const checkLinks = process.argv.includes("--check-links");
 const errors = [];
 const LINK_CHECK_ATTEMPTS = 3;
 const LINK_CHECK_CONCURRENCY = 3;
+const LINK_CHECK_MAX_REDIRECTS = 5;
 const RETRYABLE_STATUSES = new Set([408, 425, 429, 500, 502, 503, 504]);
 
 function isNonEmptyString(value) {
@@ -110,6 +115,49 @@ function validateLearningPaths() {
   });
 }
 
+function validateCollections() {
+  if (!Array.isArray(collections)) {
+    addError("collections must be an array.");
+    return;
+  }
+
+  const sourceIds = new Set(sources.map((source) => source.id));
+  const collectionIds = new Set();
+
+  collections.forEach((collection, index) => {
+    const label = collection?.id || `collection at index ${index}`;
+
+    if (!collection || typeof collection !== "object") {
+      addError(`${label}: collection must be an object.`);
+      return;
+    }
+
+    ["id", "title", "description", "outcome"].forEach((field) => {
+      if (!isNonEmptyString(collection[field])) {
+        addError(`${label}: field "${field}" must be a non-empty string.`);
+      }
+    });
+
+    if (isNonEmptyString(collection.id)) {
+      if (collectionIds.has(collection.id)) {
+        addError(`${label}: duplicate collection id.`);
+      }
+      collectionIds.add(collection.id);
+    }
+
+    if (!Array.isArray(collection.sourceIds) || collection.sourceIds.length === 0) {
+      addError(`${label}: sourceIds must be a non-empty array.`);
+      return;
+    }
+
+    collection.sourceIds.forEach((sourceId) => {
+      if (!sourceIds.has(sourceId)) {
+        addError(`${label}: references missing source id "${sourceId}".`);
+      }
+    });
+  });
+}
+
 function reportSchemaErrors() {
   if (!errors.length) return;
 
@@ -126,37 +174,108 @@ function wait(milliseconds) {
   });
 }
 
-function formatFetchError(error) {
-  const cause = error?.cause?.code || error?.cause?.message;
-  return error?.name === "AbortError" ? "request timed out" : [error.message, cause].filter(Boolean).join(": ");
+function formatRequestError(error) {
+  return error?.code || error?.message || "request failed";
+}
+
+function requestUrl(url, method, redirectCount = 0) {
+  return new Promise((resolve) => {
+    const parsedUrl = new URL(url);
+    const client = parsedUrl.protocol === "http:" ? http : https;
+    const request = client.request(
+      parsedUrl,
+      {
+        method,
+        timeout: 20000,
+        headers: {
+          Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,application/pdf,*/*;q=0.8",
+          "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+          Connection: "close",
+          "User-Agent": "agent-architecture-reading-hub-source-validator/1.0",
+        },
+      },
+      (response) => {
+        const status = response.statusCode;
+        const location = response.headers.location;
+
+        response.resume();
+
+        if (status >= 300 && status < 400 && location) {
+          if (redirectCount >= LINK_CHECK_MAX_REDIRECTS) {
+            resolve({ error: "too many redirects" });
+            return;
+          }
+
+          const nextUrl = new URL(location, parsedUrl).toString();
+          resolve(requestUrl(nextUrl, method, redirectCount + 1));
+          return;
+        }
+
+        resolve({ status });
+      },
+    );
+
+    request.on("timeout", () => {
+      request.destroy(new Error("request timed out"));
+    });
+    request.on("error", (error) => {
+      resolve({ error: formatRequestError(error) });
+    });
+    request.end();
+  });
 }
 
 async function requestSourceUrl(source, method) {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 20000);
-
-  try {
-    const response = await fetch(source.url, {
-      method,
-      redirect: "follow",
-      signal: controller.signal,
-      headers: {
-        Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,application/pdf,*/*;q=0.8",
-        "User-Agent": "agent-architecture-reading-hub-source-validator/1.0",
-      },
-    });
-    const { status } = response;
-
-    if (response.body) {
-      await response.body.cancel().catch(() => {});
-    }
-
-    return { status };
-  } catch (error) {
-    return { error: formatFetchError(error) };
-  } finally {
-    clearTimeout(timeout);
+  const curlResult = await requestWithCurl(source.url, method);
+  if (curlResult.fallback) {
+    return requestUrl(source.url, method);
   }
+  return curlResult;
+}
+
+function requestWithCurl(url, method) {
+  const args = [
+    "-L",
+    "-sS",
+    "-o",
+    "/dev/null",
+    "-w",
+    "%{http_code}",
+    "--connect-timeout",
+    "10",
+    "--max-time",
+    "30",
+    "--retry",
+    "2",
+    "--retry-delay",
+    "1",
+    "--retry-all-errors",
+    "-A",
+    "agent-architecture-reading-hub-source-validator/1.0",
+  ];
+
+  if (method === "HEAD") {
+    args.push("-I");
+  }
+
+  args.push(url);
+
+  return new Promise((resolve) => {
+    execFile("curl", args, (error, stdout, stderr) => {
+      if (error?.code === "ENOENT") {
+        resolve({ fallback: true });
+        return;
+      }
+
+      const status = Number.parseInt(String(stdout).trim().slice(-3), 10);
+      if (Number.isInteger(status) && status > 0) {
+        resolve({ status });
+        return;
+      }
+
+      resolve({ error: stderr.trim() || formatRequestError(error) });
+    });
+  });
 }
 
 async function fetchSourceUrl(source) {
@@ -221,9 +340,12 @@ async function validateLinks() {
 
 validateSources();
 validateLearningPaths();
+validateCollections();
 reportSchemaErrors();
 
-console.log(`Validated ${sources.length} sources, ${learningPaths.length} learning path modules.`);
+console.log(
+  `Validated ${sources.length} sources, ${learningPaths.length} learning path modules, ${collections.length} collections.`,
+);
 
 if (checkLinks) {
   await validateLinks();
