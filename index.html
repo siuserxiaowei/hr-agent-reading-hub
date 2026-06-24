@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="飞书 HR 招聘 Agent 阅读台：汇总官方文档、Agent 方法论、招聘自动化案例和课程设计资料。"
+    />
+    <title>HR 招聘 Agent 阅读台</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="资料筛选">
+        <a class="brand" href="#top" aria-label="回到顶部">
+          <span class="brand-mark">HA</span>
+          <span>
+            <strong>HR 招聘 Agent</strong>
+            <small>阅读台</small>
+          </span>
+        </a>
+
+        <nav class="nav-stack" aria-label="页面导航">
+          <a href="#sources" class="nav-link active">资料库</a>
+          <a href="#course" class="nav-link">课程路线</a>
+          <a href="#guardrails" class="nav-link">边界说明</a>
+          <a href="#candidates" class="nav-link">待深读候选</a>
+        </nav>
+
+        <section class="filter-panel" aria-label="分类筛选">
+          <p class="eyebrow">分类</p>
+          <div id="categoryFilters" class="filter-list"></div>
+        </section>
+
+        <section class="filter-panel" aria-label="阅读状态">
+          <p class="eyebrow">阅读状态</p>
+          <button class="filter-chip active" data-status="all">全部</button>
+          <button class="filter-chip" data-status="unread">未读</button>
+          <button class="filter-chip" data-status="read">已读</button>
+        </section>
+      </aside>
+
+      <main id="top" class="content">
+        <header class="topbar">
+          <div>
+            <h1>HR 招聘 Agent 阅读台</h1>
+            <p>把已整理的飞书、Agent、招聘自动化资料放到一个可检索、可标记、可复盘的在线网页里。</p>
+          </div>
+          <a class="topbar-link" href="https://vi8r050ecuz.feishu.cn/docx/STYCdj5aloCluBxoLbkceVZTnhe" target="_blank" rel="noreferrer">
+            飞书研究文档
+          </a>
+        </header>
+
+        <section class="hero-grid" aria-label="阅读台总览">
+          <div class="hero-copy">
+            <p class="section-kicker">课程资料地图</p>
+            <h2>从“会用 AI”到“能架构业务 Agent”</h2>
+            <p>
+              这里收纳了 20 个已整理来源。公开网页不会整篇转载原文，而是提供阅读摘要、课程用途、重点问题和原文入口，方便你集中学习并准备讲师申请。
+            </p>
+            <div class="hero-actions">
+              <a class="primary-action" href="#sources">开始阅读</a>
+              <a class="secondary-action" href="#course">看课程路线</a>
+            </div>
+          </div>
+          <figure class="hero-art">
+            <img src="./assets/reading-hub-concept.png" alt="HR 招聘 Agent 阅读台界面概念图" />
+          </figure>
+        </section>
+
+        <section class="metrics-row" aria-label="资料统计">
+          <article>
+            <strong id="totalCount">20</strong>
+            <span>已整理来源</span>
+          </article>
+          <article>
+            <strong id="officialCount">8</strong>
+            <span>官方/一手资料</span>
+          </article>
+          <article>
+            <strong id="readCount">0</strong>
+            <span>已标记阅读</span>
+          </article>
+          <article>
+            <strong id="progressCount">0%</strong>
+            <span>阅读进度</span>
+          </article>
+        </section>
+
+        <section id="sources" class="workspace">
+          <div class="section-heading">
+            <div>
+              <p class="section-kicker">原文链接</p>
+              <h2>全部资料</h2>
+            </div>
+            <label class="search-box">
+              <span>搜索内容、平台、课程模块</span>
+              <input id="searchInput" type="search" placeholder="例如：飞书、多维表格、human-in-the-loop" />
+            </label>
+          </div>
+
+          <div class="workspace-layout">
+            <section class="source-list" aria-label="资料卡片列表">
+              <div id="sourceCards" class="cards-grid"></div>
+            </section>
+
+            <aside class="reader-panel" aria-label="选中资料详情">
+              <div id="readerDetail" class="reader-card"></div>
+            </aside>
+          </div>
+        </section>
+
+        <section id="course" class="course-section">
+          <div class="section-heading">
+            <div>
+              <p class="section-kicker">课程路线</p>
+              <h2>把资料转成 45-60 分钟分享</h2>
+            </div>
+          </div>
+          <div id="courseTimeline" class="timeline"></div>
+        </section>
+
+        <section id="guardrails" class="guardrail-section">
+          <div class="section-heading">
+            <div>
+              <p class="section-kicker">边界说明</p>
+              <h2>公开阅读页的内容边界</h2>
+            </div>
+          </div>
+          <div class="guardrail-grid">
+            <article>
+              <h3>不做全文搬运</h3>
+              <p>这个站点只提供阅读笔记、短摘要、课程关联和原文入口。受版权保护的文章请跳转原站阅读。</p>
+            </article>
+            <article>
+              <h3>招聘场景保留人工审核</h3>
+              <p>AI 可以辅助解析、摘要、评分建议和状态流转，但候选人去留、敏感沟通和 offer 决策应由人负责。</p>
+            </article>
+            <article>
+              <h3>资料状态透明</h3>
+              <p>已经深读和只是候选的资料会分开标注，避免把未验证信息当作课程结论。</p>
+            </article>
+          </div>
+        </section>
+
+        <section id="candidates" class="candidate-section">
+          <div class="section-heading">
+            <div>
+              <p class="section-kicker">待深读候选</p>
+              <h2>公众号候选源</h2>
+            </div>
+          </div>
+          <ul id="candidateList" class="candidate-list"></ul>
+        </section>
+      </main>
+    </div>
+
+    <script src="./script.js"></script>
+  </body>
+</html>
