@@ -18,7 +18,7 @@ const REQUIRED_FIELDS = [
 
 const checkLinks = process.argv.includes("--check-links");
 const errors = [];
-const LINK_CHECK_ATTEMPTS = 2;
+const LINK_CHECK_ATTEMPTS = 3;
 const LINK_CHECK_CONCURRENCY = 3;
 const RETRYABLE_STATUSES = new Set([408, 425, 429, 500, 502, 503, 504]);
 
