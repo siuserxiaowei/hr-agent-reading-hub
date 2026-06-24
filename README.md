@@ -7,6 +7,7 @@
 - 收纳 40+ 个已整理来源，包含 OpenAI、Anthropic、MCP、LangGraph、Google ADK、Microsoft Agent Framework、AutoGen、CrewAI、Pydantic AI、OWASP/NIST、飞书和招聘自动化案例。
 - 页面提供摘要、学习用途、阅读重点和原文链接。
 - 不公开搬运受版权保护文章全文。
+- 主资料库只放已验证来源；候选或未深读资料保留在候选列表，不混入正式 `sources` 数据。
 
 ## 本地预览
 
@@ -15,3 +16,11 @@ python3 -m http.server 5173
 ```
 
 访问 `http://localhost:5173`。
+
+## 验证
+
+```bash
+npm run validate:sources
+npm run check:links
+npm run smoke
+```
