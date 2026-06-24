@@ -41,7 +41,8 @@ a {
 }
 
 button,
-input {
+input,
+select {
   font: inherit;
 }
 
@@ -303,18 +304,45 @@ input {
   margin: 0;
 }
 
+.source-count {
+  color: var(--muted);
+  display: inline-flex;
+  font-size: 13px;
+  font-weight: 650;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
+.source-controls {
+  align-items: end;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.sort-box,
 .search-box {
   display: grid;
   gap: 7px;
+}
+
+.sort-box {
+  min-width: 150px;
+}
+
+.search-box {
   max-width: 430px;
   width: min(42vw, 430px);
 }
 
+.sort-box span,
 .search-box span {
   color: var(--muted);
   font-size: 12px;
 }
 
+.sort-box select,
 .search-box input {
   background: #fff;
   border: 1px solid var(--line);
@@ -326,6 +354,7 @@ input {
   width: 100%;
 }
 
+.sort-box select:focus,
 .search-box input:focus {
   border-color: var(--teal);
   box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
@@ -342,6 +371,40 @@ input {
   display: grid;
   gap: 12px;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.category-summary {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(128px, 1fr));
+  margin-bottom: 12px;
+}
+
+.summary-card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  min-height: 72px;
+  padding: 14px;
+}
+
+.summary-card.active {
+  border-color: rgba(15, 118, 110, 0.5);
+  box-shadow: inset 3px 0 0 var(--teal);
+}
+
+.summary-card strong {
+  color: var(--teal-strong);
+  display: block;
+  font-size: 23px;
+  line-height: 1;
+}
+
+.summary-card span {
+  color: var(--muted);
+  display: block;
+  font-size: 13px;
+  margin-top: 8px;
 }
 
 .source-card {
@@ -443,6 +506,16 @@ input {
   max-height: calc(100vh - 48px);
   overflow: auto;
   padding: 20px;
+}
+
+.reader-card.collapsed {
+  border-style: dashed;
+  padding: 12px;
+}
+
+.reader-empty {
+  border: 0;
+  padding: 12px;
 }
 
 .reader-card h3 {
@@ -631,6 +704,21 @@ input {
   .topbar-link,
   .search-box {
     width: 100%;
+  }
+
+  .source-controls {
+    align-items: stretch;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .sort-box {
+    width: 100%;
+  }
+
+  .source-count {
+    display: flex;
+    margin: 8px 0 0;
   }
 
   .hero-grid,

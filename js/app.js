@@ -5,12 +5,16 @@ import { createInitialState, filterSources, getSourceById, saveReadState } from 
 import { renderApp } from "./render.js";
 
 const state = createInitialState(sources);
+const narrowScreenQuery = window.matchMedia("(max-width: 1180px)");
 
 const elements = {
   categoryFilters: document.querySelector("#categoryFilters"),
   sourceCards: document.querySelector("#sourceCards"),
   readerDetail: document.querySelector("#readerDetail"),
   searchInput: document.querySelector("#searchInput"),
+  sortSelect: document.querySelector("#sortSelect"),
+  activeCount: document.querySelector("#activeCount"),
+  categorySummary: document.querySelector("#categorySummary"),
   courseTimeline: document.querySelector("#courseTimeline"),
   candidateList: document.querySelector("#candidateList"),
   statusFilters: document.querySelectorAll("[data-status]"),
@@ -34,6 +38,10 @@ const actions = {
     state.query = query;
     render();
   },
+  onSortChange(sort) {
+    state.sort = sort;
+    render();
+  },
   onSelectSource(id) {
     state.selectedId = id;
     render();
@@ -55,10 +63,22 @@ const actions = {
     render();
     elements.sourcesSection.scrollIntoView({ behavior: "smooth" });
   },
+  onClearDetailFocus() {
+    if (!narrowScreenQuery.matches) return;
+
+    state.selectedId = "";
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+    render();
+  },
 };
 
 function ensureSelectedSourceIsVisible() {
   const items = filterSources(sources, state);
+  if (!items.length) return;
+  if (narrowScreenQuery.matches && !state.selectedId) return;
+
   if (items.length && !items.some((item) => item.id === state.selectedId)) {
     state.selectedId = items[0].id;
   }
@@ -81,4 +101,25 @@ function render() {
   });
 }
 
+function bindViewportShortcuts() {
+  document.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape" || !narrowScreenQuery.matches) return;
+    if (document.activeElement instanceof HTMLElement) {
+      const tagName = document.activeElement.tagName;
+      if (tagName === "INPUT" || tagName === "TEXTAREA" || tagName === "SELECT") return;
+    }
+    if (!state.selectedId) return;
+
+    event.preventDefault();
+    actions.onClearDetailFocus();
+  });
+
+  if (typeof narrowScreenQuery.addEventListener === "function") {
+    narrowScreenQuery.addEventListener("change", render);
+  } else {
+    narrowScreenQuery.addListener(render);
+  }
+}
+
+bindViewportShortcuts();
 render();

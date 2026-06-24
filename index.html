@@ -92,16 +92,27 @@
           <div class="section-heading">
             <div>
               <p class="section-kicker">原文链接</p>
-              <h2>全部资料</h2>
+              <h2>全部资料 <span id="activeCount" class="source-count">当前显示 0 / 总计 0</span></h2>
             </div>
-            <label class="search-box">
-              <span>搜索内容、平台、学习模块</span>
-              <input id="searchInput" type="search" placeholder="例如：工具调用、MCP、evaluation、human-in-the-loop" />
-            </label>
+            <div class="source-controls">
+              <label class="sort-box">
+                <span>排序</span>
+                <select id="sortSelect">
+                  <option value="priority">推荐优先</option>
+                  <option value="category">分类</option>
+                  <option value="platform">平台</option>
+                </select>
+              </label>
+              <label class="search-box">
+                <span>搜索内容、平台、学习模块</span>
+                <input id="searchInput" type="search" placeholder="例如：工具调用、MCP、evaluation、human-in-the-loop" />
+              </label>
+            </div>
           </div>
 
           <div class="workspace-layout">
             <section class="source-list" aria-label="资料卡片列表">
+              <div id="categorySummary" class="category-summary" aria-label="当前显示资料的分类摘要"></div>
               <div id="sourceCards" class="cards-grid"></div>
             </section>
 

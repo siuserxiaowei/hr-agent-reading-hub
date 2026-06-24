@@ -2,9 +2,11 @@ import { filterSources, getSourceById } from "./state.js";
 
 export function renderApp(context) {
   bindSearch(context);
+  bindSort(context);
   renderFilters(context);
   renderStatusFilters(context);
   renderMetrics(context);
+  renderSourceSummary(context);
   renderCards(context);
   renderReader(context);
   renderCourse(context);
@@ -20,6 +22,18 @@ function bindSearch({ state, elements, actions }) {
 
   elements.searchInput.oninput = (event) => {
     actions.onSearchChange(event.target.value);
+  };
+}
+
+function bindSort({ state, elements, actions }) {
+  if (!elements.sortSelect) return;
+
+  if (elements.sortSelect.value !== state.sort) {
+    elements.sortSelect.value = state.sort;
+  }
+
+  elements.sortSelect.onchange = (event) => {
+    actions.onSortChange(event.target.value);
   };
 }
 
@@ -68,6 +82,38 @@ function renderMetrics({ sources, firstPartyPlatformNames, state, elements }) {
   elements.progressCount.textContent = `${progress}%`;
 }
 
+function renderSourceSummary({ sources, categories, state, elements }) {
+  const items = filterSources(sources, state);
+  if (elements.activeCount) {
+    elements.activeCount.textContent = `当前显示 ${items.length} / 总计 ${sources.length}`;
+  }
+
+  if (!elements.categorySummary) return;
+
+  const categoryCounts = items.reduce((counts, source) => {
+    counts.set(source.category, (counts.get(source.category) || 0) + 1);
+    return counts;
+  }, new Map());
+  const summaryCards = categories
+    .filter((category) => category !== "全部")
+    .map((category) => ({
+      category,
+      count: categoryCounts.get(category) || 0,
+    }))
+    .filter(({ count }) => count > 0);
+
+  elements.categorySummary.innerHTML = summaryCards
+    .map(
+      ({ category, count }) => `
+        <article class="summary-card ${state.category === category ? "active" : ""}">
+          <strong>${count}</strong>
+          <span>${category}</span>
+        </article>
+      `,
+    )
+    .join("");
+}
+
 function renderCards({ sources, state, elements, actions }) {
   const items = filterSources(sources, state);
 
@@ -76,7 +122,7 @@ function renderCards({ sources, state, elements, actions }) {
     return;
   }
 
-  const selectedId = items.some((item) => item.id === state.selectedId) ? state.selectedId : items[0].id;
+  const selectedId = state.selectedId && items.some((item) => item.id === state.selectedId) ? state.selectedId : "";
 
   elements.sourceCards.innerHTML = items
     .map((source) => {
@@ -124,13 +170,15 @@ function renderCards({ sources, state, elements, actions }) {
 }
 
 function renderReader({ sources, state, elements, actions }) {
-  const source = getSourceById(sources, state.selectedId) || sources[0];
+  const source = state.selectedId ? getSourceById(sources, state.selectedId) : null;
 
   if (!source) {
-    elements.readerDetail.innerHTML = `<div class="empty-state">暂无资料。</div>`;
+    elements.readerDetail.classList.add("collapsed");
+    elements.readerDetail.innerHTML = `<div class="empty-state reader-empty">选择资料卡片查看详情。</div>`;
     return;
   }
 
+  elements.readerDetail.classList.remove("collapsed");
   const isRead = state.read.has(source.id);
   elements.readerDetail.innerHTML = `
     <div class="card-meta">
