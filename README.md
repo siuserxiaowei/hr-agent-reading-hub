@@ -1,11 +1,11 @@
-# HR 招聘 Agent 阅读台
+# AI Agent 架构阅读台
 
-这是一个 GitHub Pages 静态站点，用来集中阅读“用飞书搭 HR 招聘 Agent”相关资料。
+这是一个 GitHub Pages 静态站点，用来集中阅读“怎么做一个好的 AI Agent”相关资料。HR 招聘 Agent 和飞书多维表格仍作为业务案例保留，但站点范围已经扩展到 Agent 入门、架构模式、工具与上下文、评估观测、安全治理、框架生态和业务落地。
 
 ## 内容边界
 
-- 收纳 20 个已整理来源，包含飞书官方资料、Agent 方法论、招聘自动化案例、低代码/RPA 工作流案例。
-- 页面提供摘要、课程用途、阅读重点和原文链接。
+- 收纳 40+ 个已整理来源，包含 OpenAI、Anthropic、MCP、LangGraph、Google ADK、Microsoft Agent Framework、AutoGen、CrewAI、Pydantic AI、OWASP/NIST、飞书和招聘自动化案例。
+- 页面提供摘要、学习用途、阅读重点和原文链接。
 - 不公开搬运受版权保护文章全文。
 
 ## 本地预览

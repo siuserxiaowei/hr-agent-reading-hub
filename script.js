@@ -1,5 +1,299 @@
 const sources = [
   {
+    id: "openai-practical-guide-agents",
+    title: "A Practical Guide to Building Agents",
+    platform: "OpenAI",
+    category: "入门总览",
+    url: "https://cdn.openai.com/business-guides-and-resources/a-practical-guide-to-building-agents.pdf",
+    status: "verified",
+    priority: "先读",
+    module: "Agent 总览",
+    usefulFor: "系统理解什么时候该做 Agent、Agent 的组成部分，以及从单一流程到多 Agent 编排的路线。",
+    focus: ["Agent 定义", "适用场景", "工具", "指令", "编排", "安全护栏"],
+    note:
+      "这是非常适合开局的一篇：它会帮你先判断“这个问题到底需不需要 Agent”，避免一上来就堆框架和多智能体。",
+  },
+  {
+    id: "openai-agents-python",
+    title: "OpenAI Agents SDK",
+    platform: "OpenAI",
+    category: "框架生态",
+    url: "https://openai.github.io/openai-agents-python/",
+    status: "verified",
+    priority: "先读",
+    module: "工程实现",
+    usefulFor: "理解生产级 Agent SDK 如何组织 agent、tool、handoff、guardrail、session 和 tracing。",
+    focus: ["Agent", "Tools", "Handoffs", "Sessions", "Tracing"],
+    note:
+      "如果你想从概念进入工程，这份文档是入口。读的时候不要只看代码 API，要看它如何把可观测、交接和护栏放进架构里。",
+  },
+  {
+    id: "openai-guardrails",
+    title: "Guardrails",
+    platform: "OpenAI Agents SDK",
+    category: "安全治理",
+    url: "https://openai.github.io/openai-agents-python/guardrails/",
+    status: "verified",
+    priority: "先读",
+    module: "边界与护栏",
+    usefulFor: "学习如何在 Agent 输入、输出和关键步骤上放护栏，让系统在越界时暂停或拒绝。",
+    focus: ["输入护栏", "输出护栏", "tripwire", "人工审核", "风险动作"],
+    note:
+      "做好 Agent 不是让它无限自主，而是知道哪些步骤要拦住、哪些要审核、哪些要记录。护栏是系统可信的关键。",
+  },
+  {
+    id: "openai-tracing",
+    title: "Tracing",
+    platform: "OpenAI Agents SDK",
+    category: "评估观测",
+    url: "https://openai.github.io/openai-agents-python/tracing/",
+    status: "verified",
+    priority: "先读",
+    module: "可观测性",
+    usefulFor: "理解怎么追踪 Agent 的运行过程：模型调用、工具调用、handoff、错误和耗时。",
+    focus: ["trace", "span", "tool call", "handoff", "debug"],
+    note:
+      "没有 tracing 的 Agent 很难调试。做好的 Agent 必须能回答：它为什么这么做、在哪一步错了、成本和延迟花在哪里。",
+  },
+  {
+    id: "anthropic-writing-tools",
+    title: "Writing Tools for Agents",
+    platform: "Anthropic",
+    category: "工具与上下文",
+    url: "https://www.anthropic.com/engineering/writing-tools-for-agents",
+    status: "verified",
+    priority: "先读",
+    module: "工具设计",
+    usefulFor: "学习如何给 Agent 设计工具，尤其是工具命名、参数、错误反馈和上下文返回。",
+    focus: ["工具描述", "参数设计", "错误处理", "工具返回", "可用性"],
+    note:
+      "很多 Agent 做不好，不是模型不行，而是工具写得太差。工具设计要像给新人写操作手册：清楚、稳定、可恢复。",
+  },
+  {
+    id: "anthropic-context-engineering",
+    title: "Effective Context Engineering for AI Agents",
+    platform: "Anthropic",
+    category: "工具与上下文",
+    url: "https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents",
+    status: "verified",
+    priority: "先读",
+    module: "上下文工程",
+    usefulFor: "理解 Agent 长流程中上下文如何被选择、压缩、保留和更新。",
+    focus: ["context engineering", "压缩", "选择", "状态", "长期任务"],
+    note:
+      "Prompt 只是起点，上下文工程才决定 Agent 能不能跑长任务。读这篇时重点看：哪些信息应该进入上下文，哪些应该放进外部状态。",
+  },
+  {
+    id: "mcp-intro",
+    title: "Model Context Protocol Introduction",
+    platform: "MCP 官方文档",
+    category: "工具与上下文",
+    url: "https://modelcontextprotocol.io/docs/getting-started/intro",
+    status: "verified",
+    priority: "先读",
+    module: "工具协议",
+    usefulFor: "理解 MCP 为什么会成为 Agent 连接外部工具、数据和应用的通用协议。",
+    focus: ["tools", "resources", "prompts", "client", "server"],
+    note:
+      "MCP 可以理解成 Agent 的 USB-C。它不解决所有业务问题，但能标准化 Agent 怎么连接工具和上下文源。",
+  },
+  {
+    id: "mcp-spec",
+    title: "Model Context Protocol Specification",
+    platform: "MCP 官方规范",
+    category: "工具与上下文",
+    url: "https://modelcontextprotocol.io/specification/2025-06-18",
+    status: "verified",
+    priority: "参考",
+    module: "工具协议",
+    usefulFor: "深入理解 MCP 的协议对象、能力声明、消息流程和客户端/服务端边界。",
+    focus: ["protocol", "capabilities", "transport", "tools", "resources"],
+    note:
+      "这份适合进阶读。做业务 Agent 时，不一定马上写 MCP Server，但要知道标准工具接口长什么样。",
+  },
+  {
+    id: "langgraph-memory",
+    title: "Add and Manage Memory",
+    platform: "LangGraph",
+    category: "架构模式",
+    url: "https://docs.langchain.com/oss/python/langgraph/add-memory",
+    status: "verified",
+    priority: "先读",
+    module: "状态与记忆",
+    usefulFor: "学习 Agent 如何跨轮次、跨任务保留状态和用户偏好。",
+    focus: ["short-term memory", "long-term memory", "state", "checkpoint"],
+    note:
+      "一个好的 Agent 不只会回答当前问题，还要能带着状态做事。记忆不是越多越好，而是要分清短期状态、长期偏好和业务记录。",
+  },
+  {
+    id: "twelve-factor-agents",
+    title: "12-Factor Agents",
+    platform: "HumanLayer / GitHub",
+    category: "架构模式",
+    url: "https://github.com/humanlayer/12-factor-agents",
+    status: "verified",
+    priority: "先读",
+    module: "架构原则",
+    usefulFor: "用工程化原则理解可控、可测试、可恢复的 Agent 应该怎么设计。",
+    focus: ["工具调用", "控制流", "状态", "可测试", "人工确认"],
+    note:
+      "这套原则很适合反复读。它会提醒你：不要把所有控制权交给模型，业务系统仍然需要显式状态、显式控制流和可靠边界。",
+  },
+  {
+    id: "google-adk",
+    title: "Google Agent Development Kit",
+    platform: "Google",
+    category: "框架生态",
+    url: "https://google.github.io/adk-docs/",
+    status: "verified",
+    priority: "参考",
+    module: "工程实现",
+    usefulFor: "了解 Google 的 Agent 开发套件如何组织 agents、tools、sessions、evaluations 和部署。",
+    focus: ["agents", "tools", "sessions", "evals", "deployment"],
+    note:
+      "它适合横向比较：不同框架都在解决类似问题，只是抽象和工程入口不同。",
+  },
+  {
+    id: "microsoft-agent-framework",
+    title: "Microsoft Agent Framework Overview",
+    platform: "Microsoft Learn",
+    category: "框架生态",
+    url: "https://learn.microsoft.com/en-us/agent-framework/overview/",
+    status: "verified",
+    priority: "参考",
+    module: "工程实现",
+    usefulFor: "理解企业级 Agent 框架如何处理工作流、编排、多 Agent、工具和部署。",
+    focus: ["workflow", "orchestration", "agents", "enterprise"],
+    note:
+      "如果你关心企业落地，这份可以用来补视野：Agent 最后要进入组织流程，而不只是 demo。",
+  },
+  {
+    id: "microsoft-autogen",
+    title: "AutoGen Documentation",
+    platform: "Microsoft AutoGen",
+    category: "框架生态",
+    url: "https://microsoft.github.io/autogen/stable/index.html",
+    status: "verified",
+    priority: "参考",
+    module: "多 Agent",
+    usefulFor: "学习多 Agent、事件驱动 Agent 和团队协作式智能体的框架思路。",
+    focus: ["multi-agent", "event-driven", "teams", "tool use"],
+    note:
+      "多 Agent 不应该一开始就上，但你需要知道它解决什么问题：分工、协作、评审、执行隔离。",
+  },
+  {
+    id: "crewai-docs",
+    title: "CrewAI Documentation",
+    platform: "CrewAI",
+    category: "框架生态",
+    url: "https://docs.crewai.com/",
+    status: "verified",
+    priority: "参考",
+    module: "多 Agent",
+    usefulFor: "理解 crew、role、task、process、flow 这类角色分工式 Agent 设计。",
+    focus: ["crews", "roles", "tasks", "flows", "process"],
+    note:
+      "它适合帮助你理解“角色分工”不是玄学，而是把任务拆给不同能力边界的 agent 或流程节点。",
+  },
+  {
+    id: "pydantic-ai",
+    title: "Pydantic AI Documentation",
+    platform: "Pydantic",
+    category: "框架生态",
+    url: "https://ai.pydantic.dev/",
+    status: "verified",
+    priority: "参考",
+    module: "工程实现",
+    usefulFor: "学习类型安全、结构化输出、依赖注入和测试友好的 Agent 工程方式。",
+    focus: ["structured output", "type safety", "dependency injection", "testing"],
+    note:
+      "好的 Agent 不只是“能跑”，还要能被类型、测试和数据结构约束。Pydantic AI 对工程习惯很有启发。",
+  },
+  {
+    id: "llamaindex-agents",
+    title: "LlamaIndex Agents",
+    platform: "LlamaIndex",
+    category: "框架生态",
+    url: "https://docs.llamaindex.ai/en/stable/understanding/agent/",
+    status: "verified",
+    priority: "参考",
+    module: "RAG 与工具",
+    usefulFor: "理解 Agent 如何结合知识库、RAG、工具调用和数据查询。",
+    focus: ["RAG", "tools", "data agents", "query planning"],
+    note:
+      "当 Agent 需要大量读资料、查数据、引用知识库时，LlamaIndex 的资料很有用。",
+  },
+  {
+    id: "haystack-agents",
+    title: "Haystack Agents",
+    platform: "deepset Haystack",
+    category: "框架生态",
+    url: "https://docs.haystack.deepset.ai/docs/agents",
+    status: "verified",
+    priority: "参考",
+    module: "RAG 与工具",
+    usefulFor: "学习 RAG pipeline 与 Agent/工具调用结合的另一套工程视角。",
+    focus: ["pipeline", "tools", "RAG", "component"],
+    note:
+      "这份适合和 LlamaIndex 对照读：Agent 很多时候不是单独存在，而是嵌在检索、生成、路由和工具管线里。",
+  },
+  {
+    id: "owasp-llm-top10",
+    title: "OWASP Top 10 for LLM Applications",
+    platform: "OWASP GenAI Security",
+    category: "安全治理",
+    url: "https://genai.owasp.org/llm-top-10/",
+    status: "verified",
+    priority: "先读",
+    module: "安全风险",
+    usefulFor: "建立 LLM/Agent 应用的安全风险清单，尤其是提示注入、敏感信息泄露和不安全工具调用。",
+    focus: ["prompt injection", "sensitive information disclosure", "unsafe output handling", "agency"],
+    note:
+      "Agent 一旦能调用工具和访问数据，安全风险会放大。这份是做公开产品或企业内部 Agent 前必须补的一课。",
+  },
+  {
+    id: "nist-genai-profile",
+    title: "NIST AI 600-1: Generative AI Profile",
+    platform: "NIST",
+    category: "安全治理",
+    url: "https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.600-1.pdf",
+    status: "verified",
+    priority: "参考",
+    module: "风险治理",
+    usefulFor: "从治理框架角度理解生成式 AI 的风险识别、衡量、管理和组织责任。",
+    focus: ["govern", "map", "measure", "manage", "risk"],
+    note:
+      "它偏治理，不是上手教程。适合在你要讲“业务 Agent 边界”和“企业落地责任”时作为底层参考。",
+  },
+  {
+    id: "promptfoo-evals",
+    title: "Promptfoo Documentation",
+    platform: "Promptfoo",
+    category: "评估观测",
+    url: "https://www.promptfoo.dev/docs/intro/",
+    status: "verified",
+    priority: "参考",
+    module: "评估测试",
+    usefulFor: "学习如何对 prompts、模型输出、RAG 和 Agent 行为做自动化测试与回归评估。",
+    focus: ["evals", "test cases", "red teaming", "regression"],
+    note:
+      "很多 Agent demo 能跑一次，但不能稳定跑一百次。Promptfoo 这类工具能帮你把感觉变成可回归测试。",
+  },
+  {
+    id: "arize-phoenix",
+    title: "Arize Phoenix Documentation",
+    platform: "Arize Phoenix",
+    category: "评估观测",
+    url: "https://docs.arize.com/phoenix",
+    status: "verified",
+    priority: "参考",
+    module: "可观测性",
+    usefulFor: "学习如何观测 LLM 应用和 Agent traces，并分析召回、工具调用和输出质量。",
+    focus: ["traces", "evals", "observability", "RAG", "debug"],
+    note:
+      "如果你想把 Agent 从 demo 推到真实使用，可观测性工具会很关键。它能让你看到每一次失败背后的链路。",
+  },
+  {
     id: "feishu-resume-template",
     title: "飞书 HR 简历初筛模板",
     platform: "飞书官方模板",
@@ -285,8 +579,27 @@ const sources = [
   },
 ];
 
-const categories = ["全部", "官方文档", "Agent 方法论", "招聘自动化", "飞书基础", "工作流案例"];
+const categories = [
+  "全部",
+  "入门总览",
+  "架构模式",
+  "工具与上下文",
+  "评估观测",
+  "安全治理",
+  "框架生态",
+  "业务案例",
+  "官方文档",
+  "Agent 方法论",
+  "招聘自动化",
+  "飞书基础",
+  "工作流案例",
+];
 const candidates = [
+  "Manus：Context Engineering for AI Agents",
+  "Latent Space：The Rise of Context Engineering",
+  "LangChain Blog：Ambient Agents 与长期运行 Agent",
+  "中文实践：AI Agent 从 0 到 1 搭建与项目复盘",
+  "中文实践：企业内部知识库 Agent / 客服 Agent / 销售 Agent 案例",
   "飞书 + AI Agent 落地指南：从流程自动化到智能助手",
   "HR 招聘 Agent 搭建（评估）",
   "简历太多看不过来？用飞书多维表格搭一个 AI 初筛工具",
@@ -296,34 +609,46 @@ const candidates = [
 
 const courseModules = [
   {
-    time: "0-8 分钟",
-    title: "趋势判断",
-    body: "会用 AI 正在变成基础能力，能把业务流程架构成 Agent 系统才更有壁垒。",
-    sourceIds: ["anthropic-effective-agents", "openai-agents-sdk", "hr-agent-paper"],
+    time: "第 1 步",
+    title: "先判断：什么时候该做 Agent",
+    body: "不要把所有 AI 应用都叫 Agent。先判断任务是否需要多步执行、工具调用、状态保持和反馈闭环。",
+    sourceIds: ["openai-practical-guide-agents", "anthropic-effective-agents", "twelve-factor-agents"],
   },
   {
-    time: "8-18 分钟",
-    title: "拆 HR 招聘业务流",
-    body: "从 JD、简历收集、初筛、候选人沟通、面试安排到反馈沉淀，先画业务漏斗。",
-    sourceIds: ["feishu-recruitment-system", "feishu-recruiting-quickstart", "zhihu-ai-recruiting"],
+    time: "第 2 步",
+    title: "设计工具与上下文",
+    body: "一个好 Agent 的能力边界很大程度由工具、上下文、资源和提示结构决定，而不是只由模型决定。",
+    sourceIds: ["anthropic-writing-tools", "anthropic-context-engineering", "mcp-intro", "mcp-spec"],
   },
   {
-    time: "18-30 分钟",
-    title: "定义 Agent 边界",
-    body: "自动化负责准备证据和推进流程，人负责定义标准、复核结果和承担决策。",
-    sourceIds: ["langgraph-overview", "langchain-human-loop", "n8n-recruitment-pipeline"],
+    time: "第 3 步",
+    title: "把工作流、状态和记忆做清楚",
+    body: "长流程 Agent 需要显式状态、检查点、短期/长期记忆和人工介入点，否则很难稳定交付。",
+    sourceIds: ["langgraph-overview", "langgraph-memory", "langchain-human-loop"],
   },
   {
-    time: "30-48 分钟",
-    title: "搭最小可用系统",
-    body: "用飞书多维表格作为业务中枢，完成简历进入、AI 初筛、状态流转和消息草稿。",
-    sourceIds: ["feishu-resume-template", "feishu-base-workflow", "feishu-http-request", "dify-resume-screening"],
+    time: "第 4 步",
+    title: "横向比较工程框架",
+    body: "不同框架都在解决 agent、tool、memory、handoff、eval、deploy 等问题；先理解抽象，再选工具。",
+    sourceIds: ["openai-agents-python", "google-adk", "microsoft-agent-framework", "pydantic-ai"],
   },
   {
-    time: "48-60 分钟",
-    title: "从 60 分到更高分",
-    body: "让学员看到替代执行之后，真正要沉淀的是岗位画像、候选人质量判断和组织招聘经验。",
-    sourceIds: ["feishu-ai-resume-tool", "n8n-hr-job-posting", "hermes-feishu"],
+    time: "第 5 步",
+    title: "加入评估、观测和回归测试",
+    body: "从 demo 到可用系统，核心差距是能否追踪、评估、复现和持续改进。",
+    sourceIds: ["openai-tracing", "promptfoo-evals", "arize-phoenix"],
+  },
+  {
+    time: "第 6 步",
+    title: "补上安全治理和人工审核",
+    body: "Agent 能调用工具后，权限、提示注入、敏感数据、越权动作和高风险决策都必须被设计进系统。",
+    sourceIds: ["openai-guardrails", "owasp-llm-top10", "nist-genai-profile"],
+  },
+  {
+    time: "第 7 步",
+    title: "回到业务案例做闭环",
+    body: "最后用 HR、飞书、多维表格、n8n、Dify 等案例，把方法论落到真实业务流程和数据回写里。",
+    sourceIds: ["feishu-resume-template", "feishu-base-workflow", "n8n-recruitment-pipeline", "dify-resume-screening"],
   },
 ];
 
@@ -332,7 +657,7 @@ const state = {
   status: "all",
   query: "",
   selectedId: sources[0].id,
-  read: new Set(JSON.parse(localStorage.getItem("hrAgentReadSources") || "[]")),
+  read: new Set(JSON.parse(localStorage.getItem("agentArchitectureReadSources") || localStorage.getItem("hrAgentReadSources") || "[]")),
 };
 
 const categoryFilters = document.querySelector("#categoryFilters");
@@ -343,7 +668,7 @@ const courseTimeline = document.querySelector("#courseTimeline");
 const candidateList = document.querySelector("#candidateList");
 
 function saveReadState() {
-  localStorage.setItem("hrAgentReadSources", JSON.stringify([...state.read]));
+  localStorage.setItem("agentArchitectureReadSources", JSON.stringify([...state.read]));
 }
 
 function byId(id) {
@@ -391,7 +716,13 @@ function renderFilters() {
 }
 
 function renderMetrics() {
-  const official = sources.filter((source) => source.category === "官方文档" || source.platform.includes("官方")).length;
+  const firstPartyPlatforms = ["OpenAI", "Anthropic", "Google", "Microsoft", "LangGraph", "LangChain", "MCP", "NIST", "OWASP"];
+  const official = sources.filter(
+    (source) =>
+      source.category === "官方文档" ||
+      source.platform.includes("官方") ||
+      firstPartyPlatforms.some((platform) => source.platform.includes(platform)),
+  ).length;
   const readCount = state.read.size;
   const progress = Math.round((readCount / sources.length) * 100);
   document.querySelector("#totalCount").textContent = String(sources.length);
@@ -473,7 +804,7 @@ function renderReader() {
     </div>
     <h3>${source.title}</h3>
     <p><strong>平台：</strong>${source.platform}</p>
-    <p><strong>课程用途：</strong>${source.module}</p>
+    <p><strong>学习用途：</strong>${source.module}</p>
     <p><strong>为什么读：</strong>${source.usefulFor}</p>
     <p><strong>阅读笔记：</strong>${source.note}</p>
     <p><strong>重点看：</strong></p>
