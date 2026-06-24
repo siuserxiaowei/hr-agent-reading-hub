@@ -284,6 +284,7 @@ select {
 }
 
 .workspace,
+.collections-section,
 .course-section,
 .guardrail-section,
 .candidate-section {
@@ -358,6 +359,75 @@ select {
 .search-box input:focus {
   border-color: var(--teal);
   box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
+}
+
+.collection-grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  margin-bottom: 42px;
+}
+
+.collection-card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-height: 100%;
+  padding: 18px;
+}
+
+.collection-card h3 {
+  font-size: 18px;
+  line-height: 1.35;
+  margin: 12px 0 8px;
+}
+
+.collection-card p {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.65;
+  margin: 0;
+}
+
+.collection-outcome {
+  background: var(--amber-soft);
+  border-radius: var(--radius);
+  padding: 12px;
+}
+
+.collection-outcome strong {
+  color: var(--amber);
+}
+
+.collection-links {
+  border-top: 1px solid var(--soft);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 12px;
+}
+
+.collection-links button {
+  background: var(--paper-strong);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 12px;
+  min-height: 30px;
+  padding: 0 10px;
+  text-align: left;
+}
+
+.collection-links button:hover,
+.collection-links button:focus-visible {
+  border-color: rgba(15, 118, 110, 0.5);
+  color: var(--teal-strong);
+  outline: none;
 }
 
 .workspace-layout {
@@ -680,6 +750,10 @@ select {
     grid-template-columns: 1fr;
   }
 
+  .collection-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .reader-panel {
     position: relative;
     top: 0;
@@ -723,6 +797,7 @@ select {
 
   .hero-grid,
   .metrics-row,
+  .collection-grid,
   .cards-grid,
   .guardrail-grid {
     grid-template-columns: 1fr;

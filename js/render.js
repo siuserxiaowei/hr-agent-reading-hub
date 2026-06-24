@@ -6,6 +6,7 @@ export function renderApp(context) {
   renderFilters(context);
   renderStatusFilters(context);
   renderMetrics(context);
+  renderCollections(context);
   renderSourceSummary(context);
   renderCards(context);
   renderReader(context);
@@ -80,6 +81,42 @@ function renderMetrics({ sources, firstPartyPlatformNames, state, elements }) {
   elements.officialCount.textContent = String(official);
   elements.readCount.textContent = String(readCount);
   elements.progressCount.textContent = `${progress}%`;
+}
+
+function renderCollections({ sources, collections, elements, actions }) {
+  if (!elements.collectionCards || !collections?.length) return;
+
+  elements.collectionCards.innerHTML = collections
+    .map((collection) => {
+      const sourceButtons = collection.sourceIds
+        .map((id) => {
+          const source = getSourceById(sources, id);
+          if (!source) return "";
+          return `<button data-collection-source="${id}">${source.title}</button>`;
+        })
+        .join("");
+
+      return `
+        <article class="collection-card">
+          <div>
+            <span class="tag secondary">${collection.sourceIds.length} 份资料</span>
+            <h3>${collection.title}</h3>
+            <p>${collection.description}</p>
+          </div>
+          <p class="collection-outcome"><strong>学完能做到：</strong>${collection.outcome}</p>
+          <div class="collection-links">
+            ${sourceButtons}
+          </div>
+        </article>
+      `;
+    })
+    .join("");
+
+  elements.collectionCards.querySelectorAll("[data-collection-source]").forEach((button) => {
+    button.addEventListener("click", () => {
+      actions.onJumpSource(button.dataset.collectionSource);
+    });
+  });
 }
 
 function renderSourceSummary({ sources, categories, state, elements }) {

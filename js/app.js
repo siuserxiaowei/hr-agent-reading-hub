@@ -1,4 +1,5 @@
 import { learningPaths } from "../data/learning-paths.js";
+import { collections } from "../data/collections.js";
 import { sources } from "../data/sources.js";
 import { candidates, categories, firstPartyPlatformNames } from "../data/taxonomy.js";
 import { createInitialState, filterSources, getSourceById, saveReadState } from "./state.js";
@@ -22,6 +23,7 @@ const elements = {
   officialCount: document.querySelector("#officialCount"),
   readCount: document.querySelector("#readCount"),
   progressCount: document.querySelector("#progressCount"),
+  collectionCards: document.querySelector("#collectionCards"),
   sourcesSection: document.querySelector("#sources"),
 };
 
@@ -94,6 +96,7 @@ function render() {
     categories,
     candidates,
     learningPaths,
+    collections,
     firstPartyPlatformNames,
     state,
     elements,
